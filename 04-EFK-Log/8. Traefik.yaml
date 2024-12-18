@@ -1,0 +1,28 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kibana-ingress
+  namespace: #{Build.NameSpace}#
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/uat-kibana`)
+      kind: Rule
+      services:
+        - kind: Service
+          name: #{Build.Name}#-svc
+          port: 80
+      middlewares:
+        - name: kibana-middleware
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: kibana-middleware
+  namespace: #{Build.NameSpace}#
+spec:
+  replacePathRegex:
+    regex: ^/uat-kibana/(.*)
+    replacement: /$1
